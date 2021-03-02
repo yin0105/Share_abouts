@@ -1,0 +1,39 @@
+# https://github.com/travis-ci/travis-ci/wiki/.travis.yml-options
+
+python:
+  - "2.7"
+  - "3.5"
+
+# This is redundant, but explicit,, since 'sudo' is disabled by default to
+# make use of Travis CI's container technology.
+sudo: false
+
+# Exporting our $HOME gets us around the 'sudo pip install...' issue
+# Inpiration for this fix found here:
+# https://github.com/travis-ci/travis-ci/issues/3563
+before_script:
+  - export PATH=$HOME/.local/bin:$PATH
+  - pip install -r requirements.txt --user `whoami`
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
+install: "ci/install.sh"
+
+script: "ci/script.sh"
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#civicworks"
+    on_success: change
+    on_failure: always
+  email: false
+# Turned off because the default policy is to spam ALL members of
+# the repositories' owner organization.
+# If we decide we want email notifications, feel free to uncomment this and
+# add yourself to the recipient list:
+# email:
+#    recipients:
+#     - foo@bar.com
+#     - foo2@bar.com
+#    on_success: change
+#    on_failure: change
